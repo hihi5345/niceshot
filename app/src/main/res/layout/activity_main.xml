@@ -3,22 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="#EDE5E2">
 
     <TextureView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="480dp"
+        android:layout_height="640dp"
+        android:adjustViewBounds="true"
         android:id="@+id/cameraTextureView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/pictureBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="촬영"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/camerabutton"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -26,53 +30,61 @@
         app:layout_constraintVertical_bias="0.9"
         app:layout_constraintHorizontal_bias="0.5"/>
 
-    <Button
+    <ImageButton
         android:id="@+id/timerBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0sec"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/timer0"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintHorizontal_bias="0.0"/>
+        app:layout_constraintVertical_bias="0.02"
+        app:layout_constraintHorizontal_bias="0.05"/>
 
-    <Button
+    <ImageButton
         android:id="@+id/flashBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="OFF"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/flash"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintHorizontal_bias="0.3"/>
+        app:layout_constraintVertical_bias="0.02"
+        app:layout_constraintHorizontal_bias="0.35" />
 
-    <Button
+    <ImageButton
         android:id="@+id/biasBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="480:640"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/bias3_4"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintHorizontal_bias="0.6"/>
+        app:layout_constraintVertical_bias="0.02"
+        app:layout_constraintHorizontal_bias="0.65"/>
 
-    <Button
+    <ImageButton
         android:id="@+id/modeBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="전/후"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/changemode"
+        android:scaleType="fitXY"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        app:layout_constraintHorizontal_bias="1.0"/>
+        app:layout_constraintVertical_bias="0.02"
+        app:layout_constraintHorizontal_bias="0.95"/>
 
     <Button
         android:id="@+id/guideBtn"
@@ -83,7 +95,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintVertical_bias="0.95"
         app:layout_constraintHorizontal_bias="0.9"/>
 
     <Button
@@ -95,7 +107,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintVertical_bias="0.95"
         app:layout_constraintHorizontal_bias="0.1"/>
 
     <TextView

@@ -4,8 +4,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraAccessException;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +27,8 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextureView mCameraTextureView;
     private Preview mPreview;
-    private Button pictureBtn, timerBtn, biasBtn, modeBtn, flashBtn, galleryBtn, guideBtn;
+    private ImageButton pictureBtn, timerBtn, biasBtn, modeBtn, flashBtn;
+    private Button galleryBtn, guideBtn;
     private TextView mTextview;
     final Animation in = new AlphaAnimation(0.0f, 1.0f);
     final Animation out = new AlphaAnimation(1.0f, 0.0f);
@@ -37,8 +41,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int mode;
     private int time;
     private void init(){
+        flash = false;
+        bias = 0;
+        mode = 0;
+        time = 0;
+
         mCameraTextureView = (TextureView) findViewById(R.id.cameraTextureView);
-        mPreview = new Preview(this, mCameraTextureView);
+        mPreview = new Preview(this, mCameraTextureView, mode);
         
 
         mTextview = findViewById(R.id.timerText);
@@ -75,11 +84,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         guideBtn = findViewById(R.id.guideBtn);
         guideBtn.bringToFront();
         guideBtn.setOnClickListener(this);
-
-        flash = false;
-        bias = 0;
-        mode = 0;
-        time = 0;
     }
 
     @Override
@@ -100,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (permission.equals(Manifest.permission.CAMERA)) {
                         if(grantResult == PackageManager.PERMISSION_GRANTED) {
                             mCameraTextureView = (TextureView) findViewById(R.id.cameraTextureView);
-                            mPreview = new Preview(mainActivity, mCameraTextureView);
+                            mPreview = new Preview(mainActivity, mCameraTextureView, mode);
                             Log.d("TAG","mPreview set");
                         } else {
                             Toast.makeText(this,"Should have camera permission to run", Toast.LENGTH_LONG).show();
@@ -117,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         mPreview.onResume();
+        mPreview = new Preview(this, mCameraTextureView, mode);
+        mPreview.onResume();
+        mPreview.openCamera();
     }
 
     @Override
@@ -156,28 +163,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if(view.getId() == R.id.timerBtn){
             if(time == 0){
                 time = 3;
-                timerBtn.setText("3sec");
+                timerBtn.setImageResource(R.drawable.timer3);
             } else if(time == 3){
                 time = 5;
-                timerBtn.setText("5sec");
+                timerBtn.setImageResource(R.drawable.timer5);
             } else if(time == 5){
                 time = 10;
-                timerBtn.setText("10sec");
+                timerBtn.setImageResource(R.drawable.timer10);
             } else if(time == 10){
                 time = 0;
-                timerBtn.setText("0sec");
+                timerBtn.setImageResource(R.drawable.timer0);
             }
         } else if(view.getId() == R.id.flashBtn){
             if(!flash){
                 try {
-                    flashBtn.setText("ON");
+                    //flashBtn.setText("ON");
                     mPreview.turnOnFlashLight();
                 } catch (@SuppressLint("NewApi") CameraAccessException e) {
                     e.printStackTrace();
                 }
             } else {
                 try {
-                    flashBtn.setText("OFF");
+                    //flashBtn.setText("OFF");
                     mPreview.turnOffFlashLight();
                 } catch (@SuppressLint("NewApi") CameraAccessException e) {
                     e.printStackTrace();
@@ -189,8 +196,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if(view.getId() == R.id.biasBtn){
 
         } else if(view.getId() == R.id.modeBtn){
-
+            if(mode == 0) mode = 1;
+            else mode = 0;
+            mPreview.onPause();
+            mPreview = new Preview(this, mCameraTextureView, mode);
+            mPreview.openCamera();
         } else if(view.getId() == R.id.galleryBtn){
+            Uri uri = Uri.parse("content://media/internal/images/media");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+
 
         } else if(view.getId() == R.id.guideBtn){
 

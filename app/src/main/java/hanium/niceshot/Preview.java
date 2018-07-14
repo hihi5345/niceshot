@@ -64,10 +64,13 @@ public class Preview extends Thread {
     StreamConfigurationMap map;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
-    public Preview(Context context, TextureView textureView) {
+    private final int mode;
+
+    public Preview(Context context, TextureView textureView, int m) {
         mContext = context;
         mTextureView = textureView;
         map = null;
+        mode = m;
     }
 
     @SuppressLint("NewApi")
@@ -76,7 +79,12 @@ public class Preview extends Thread {
             for (final String cameraId : cManager.getCameraIdList()) {
                 CameraCharacteristics characteristics = cManager.getCameraCharacteristics(cameraId);
                 int cOrientation = characteristics.get(CameraCharacteristics.LENS_FACING);
-                if (cOrientation == CameraCharacteristics.LENS_FACING_BACK) return cameraId;
+                Log.v("TAG123", String.valueOf(cOrientation));
+                if(mode == 0) {
+                    if (cOrientation == CameraCharacteristics.LENS_FACING_BACK) return cameraId;
+                } else {
+                    if (cOrientation == CameraCharacteristics.LENS_FACING_FRONT) return cameraId;
+                }
             }
         } catch (CameraAccessException e) {
             e.printStackTrace();
@@ -90,6 +98,7 @@ public class Preview extends Thread {
         Log.e(TAG, "openCamera E");
         try {
             String cameraId = getBackFacingCameraId(manager);
+            Log.v("TAGcameraid", cameraId);
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             mPreviewSize = map.getOutputSizes(SurfaceTexture.class)[0];
