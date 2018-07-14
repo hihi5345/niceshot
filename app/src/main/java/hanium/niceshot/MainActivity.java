@@ -1,41 +1,91 @@
 package hanium.niceshot;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.hardware.camera2.CameraAccessException;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private TextureView mCameraTextureView;
     private Preview mPreview;
-    private Button pictureBtn;
+    private Button pictureBtn, timerBtn, biasBtn, modeBtn, flashBtn, galleryBtn, guideBtn;
+    private TextView mTextview;
+    final Animation in = new AlphaAnimation(0.0f, 1.0f);
+    final Animation out = new AlphaAnimation(1.0f, 0.0f);
+
     Activity mainActivity = this;
     static final int REQUEST_CAMERA = 1;
     private Context c;
+    private boolean flash;
+    private int bias;
+    private int mode;
+    private int time;
     private void init(){
-
         mCameraTextureView = (TextureView) findViewById(R.id.cameraTextureView);
         mPreview = new Preview(this, mCameraTextureView);
+        
+
+        mTextview = findViewById(R.id.timerText);
+        mTextview.bringToFront();
+
+        in.setDuration(500);
+        out.setDuration(500);
+
         c = this;
         pictureBtn = findViewById(R.id.pictureBtn);
         pictureBtn.bringToFront();
         pictureBtn.setOnClickListener(this);
 
-    }
+        timerBtn = findViewById(R.id.timerBtn);
+        timerBtn.bringToFront();
+        timerBtn.setOnClickListener(this);
 
+        flashBtn = findViewById(R.id.flashBtn);
+        flashBtn.bringToFront();
+        flashBtn.setOnClickListener(this);
+
+        biasBtn = findViewById(R.id.biasBtn);
+        biasBtn.bringToFront();
+        biasBtn.setOnClickListener(this);
+
+        modeBtn = findViewById(R.id.modeBtn);
+        modeBtn.bringToFront();
+        modeBtn.setOnClickListener(this);
+
+        galleryBtn = findViewById(R.id.galleryBtn);
+        galleryBtn.bringToFront();
+        galleryBtn.setOnClickListener(this);
+
+        guideBtn = findViewById(R.id.guideBtn);
+        guideBtn.bringToFront();
+        guideBtn.setOnClickListener(this);
+
+        flash = false;
+        bias = 0;
+        mode = 0;
+        time = 0;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         init();
     }
 
@@ -78,7 +128,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.pictureBtn){
-            mPreview.takePicture(c);
+            int t = time * 1000;
+            final int[] check = {time};
+            Timer timer = new Timer();
+            TimerTask tt = new TimerTask()
+            {
+                @Override
+                public void run()
+                {
+                    mPreview.takePicture(c);
+                }
+            };
+            timer.schedule(tt, t);
+            new CountDownTimer(t, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    mTextview.startAnimation(out);
+                    mTextview.setText(String.valueOf(check[0]));
+                    mTextview.startAnimation(in);
+                    check[0]--;
+                }
+
+                public void onFinish() {
+                    mTextview.setText("");
+                }
+            }.start();
+        } else if(view.getId() == R.id.timerBtn){
+            if(time == 0){
+                time = 3;
+                timerBtn.setText("3sec");
+            } else if(time == 3){
+                time = 5;
+                timerBtn.setText("5sec");
+            } else if(time == 5){
+                time = 10;
+                timerBtn.setText("10sec");
+            } else if(time == 10){
+                time = 0;
+                timerBtn.setText("0sec");
+            }
+        } else if(view.getId() == R.id.flashBtn){
+            if(!flash){
+                try {
+                    flashBtn.setText("ON");
+                    mPreview.turnOnFlashLight();
+                } catch (@SuppressLint("NewApi") CameraAccessException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    flashBtn.setText("OFF");
+                    mPreview.turnOffFlashLight();
+                } catch (@SuppressLint("NewApi") CameraAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            flash = !flash;
+            Log.v("TAG", String.valueOf(flash));
+
+        } else if(view.getId() == R.id.biasBtn){
+
+        } else if(view.getId() == R.id.modeBtn){
+
+        } else if(view.getId() == R.id.galleryBtn){
+
+        } else if(view.getId() == R.id.guideBtn){
+
         }
     }
 }

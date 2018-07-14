@@ -6,8 +6,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -19,7 +23,9 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.MediaActionSound;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -32,6 +38,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -257,6 +264,9 @@ public class Preview extends Thread {
 
     @SuppressLint("NewApi")
     protected void takePicture(final Context context) {
+        //MediaActionSound mediaActionSound = new MediaActionSound();
+        //mediaActionSound.play(MediaActionSound.SHUTTER_CLICK);
+
         if(null == mCameraDevice) {
             Log.e(TAG, "mCameraDevice is null, return");
             return;
@@ -298,6 +308,10 @@ public class Preview extends Thread {
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
+
+                        bytes = bitmapToByteArray(imgRotate(byteArrayToBitmap(bytes), 90));
+
+
                         save(bytes);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -365,6 +379,47 @@ public class Preview extends Thread {
             e.printStackTrace();
         }
 
+    }
+
+    private Bitmap byteArrayToBitmap(byte[] byteArray){
+        Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+        return bitmap;
+    }
+
+    private Bitmap imgRotate(Bitmap bitmap, int angle){
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+
+        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+        bitmap.recycle();
+
+        return resizedBitmap;
+    }
+
+    public byte[] bitmapToByteArray( Bitmap bitmap ) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream() ;
+        bitmap.compress( Bitmap.CompressFormat.JPEG, 100, stream) ;
+        byte[] byteArray = stream.toByteArray() ;
+        return byteArray ;
+    }
+
+    @SuppressLint("NewApi")
+    public void turnOnFlashLight() throws CameraAccessException {
+        CameraManager mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
+        String mCameraId = getBackFacingCameraId(mCameraManager);
+        mCameraManager.setTorchMode(mCameraId, true);
+
+    }
+
+
+    @SuppressLint("NewApi")
+    public void turnOffFlashLight() throws CameraAccessException {
+        CameraManager mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
+        String mCameraId = getBackFacingCameraId(mCameraManager);
+        mCameraManager.setTorchMode(mCameraId, true);
     }
 
 }
