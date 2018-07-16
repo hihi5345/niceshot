@@ -276,6 +276,12 @@ public class Preview extends Thread {
         //MediaActionSound mediaActionSound = new MediaActionSound();
         //mediaActionSound.play(MediaActionSound.SHUTTER_CLICK);
 
+        String dirPath = "/sdcard/niceshot";
+        File f = new File(dirPath);
+        if( !f.exists() ) {
+            f.mkdirs();
+        }
+
         if(null == mCameraDevice) {
             Log.e(TAG, "mCameraDevice is null, return");
             return;
