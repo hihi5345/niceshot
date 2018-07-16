@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.Button;
@@ -91,10 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         guideBtn.setOnClickListener(this);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    private void permissionRequest(){
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
@@ -115,7 +113,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setPermissions(Manifest.permission.CAMERA)
                 .setPermissions(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .check();
+    }
 
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_main);
+        permissionRequest();
         init();
     }
 /*
