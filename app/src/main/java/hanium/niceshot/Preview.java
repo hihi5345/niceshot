@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -23,9 +22,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
-import android.media.MediaActionSound;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -45,11 +42,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.Semaphore;
 
 public class Preview extends Thread {
@@ -74,7 +69,7 @@ public class Preview extends Thread {
     }
 
     @SuppressLint("NewApi")
-    private String getBackFacingCameraId(CameraManager cManager) throws CameraAccessException {
+    private String getBackFacingCameraId(CameraManager cManager) {
         try {
             for (final String cameraId : cManager.getCameraIdList()) {
                 CameraCharacteristics characteristics = cManager.getCameraCharacteristics(cameraId);
@@ -100,7 +95,7 @@ public class Preview extends Thread {
             String cameraId = getBackFacingCameraId(manager);
             Log.v("TAGcameraid", cameraId);
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-            StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             mPreviewSize = map.getOutputSizes(SurfaceTexture.class)[0];
 
             int permissionCamera = ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA);
@@ -272,7 +267,7 @@ public class Preview extends Thread {
     }
 
     @SuppressLint("NewApi")
-    protected void takePicture(final Context context) {
+    protected File takePicture(final Context context, int h, int w) {
         //MediaActionSound mediaActionSound = new MediaActionSound();
         //mediaActionSound.play(MediaActionSound.SHUTTER_CLICK);
 
@@ -281,24 +276,31 @@ public class Preview extends Thread {
         if( !f.exists() ) {
             f.mkdirs();
         }
-
+        final File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/niceshot", String.valueOf(System.currentTimeMillis()) + ".jpg");
         if(null == mCameraDevice) {
             Log.e(TAG, "mCameraDevice is null, return");
-            return;
+            return null;
         }
 
         try {
+            /*
             Size[] jpegSizes = null;
             if (map != null) {
                 jpegSizes = map.getOutputSizes(ImageFormat.JPEG);
+                Log.v("TAGjpegSize", jpegSizes.toString());
             }
-            int width = 640;
-            int height = 480;
+            */
+            int height = h;
+            int width = w;
+            //////////// 1:1 1280 : 960
+            //////////// 3:4 1280 : 1280
+            //////////// 9:16 1280 : 1960
+/*
             if (jpegSizes != null && 0 < jpegSizes.length) {
                 width = jpegSizes[0].getWidth();
                 height = jpegSizes[0].getHeight();
             }
-
+*/
             ImageReader reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 1);
             List<Surface> outputSurfaces = new ArrayList<Surface>(2);
             outputSurfaces.add(reader.getSurface());
@@ -312,8 +314,6 @@ public class Preview extends Thread {
             int rotation = ((Activity)mContext).getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
 
-            final File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/niceshot", String.valueOf(System.currentTimeMillis()) + ".jpg");
-
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader reader) {
@@ -324,7 +324,11 @@ public class Preview extends Thread {
                         byte[] bytes = new byte[buffer.capacity()];
                         buffer.get(bytes);
 
-                        bytes = bitmapToByteArray(imgRotate(byteArrayToBitmap(bytes), 90));
+                        if(mode == 0) {
+                            bytes = bitmapToByteArray(imgRotate(byteArrayToBitmap(bytes), 90));
+                        } else {
+                            bytes = bitmapToByteArray(imgRotate(byteArrayToBitmap(bytes), 270));
+                        }
 
 
                         save(bytes);
@@ -343,11 +347,8 @@ public class Preview extends Thread {
                 private void save(byte[] bytes) throws IOException {
                     OutputStream output = null;
                     try {
-                        Log.v("TAG", "save0" + file);
                         output = new FileOutputStream(file);
-                        Log.v("TAG", "save1");
                         output.write(bytes);
-                        Log.v("TAG", bytes.toString());
                     }catch (Exception e){
                         e.printStackTrace();
                     } finally {
@@ -393,7 +394,7 @@ public class Preview extends Thread {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
-
+        return file;
     }
 
     private Bitmap byteArrayToBitmap(byte[] byteArray){
@@ -419,22 +420,6 @@ public class Preview extends Thread {
         bitmap.compress( Bitmap.CompressFormat.JPEG, 100, stream) ;
         byte[] byteArray = stream.toByteArray() ;
         return byteArray ;
-    }
-
-    @SuppressLint("NewApi")
-    public void turnOnFlashLight() throws CameraAccessException {
-        CameraManager mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-        String mCameraId = getBackFacingCameraId(mCameraManager);
-        mCameraManager.setTorchMode(mCameraId, true);
-
-    }
-
-
-    @SuppressLint("NewApi")
-    public void turnOffFlashLight() throws CameraAccessException {
-        CameraManager mCameraManager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-        String mCameraId = getBackFacingCameraId(mCameraManager);
-        mCameraManager.setTorchMode(mCameraId, true);
     }
 
 }
