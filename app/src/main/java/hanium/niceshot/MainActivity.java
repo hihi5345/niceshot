@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run()
                 {
-                    recentFile = mPreview.takePicture(c, heigth, width);
+                    recentFile = mPreview.takePicture(c, heigth, width, flash);
                 }
             };
             timer.schedule(tt, t);
@@ -111,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if(view.getId() == R.id.flashBtn){
             if(!flash){
                 flashBtn.setImageResource(R.drawable.flash);
-
             } else {
                 flashBtn.setImageResource(R.drawable.noflash);
             }

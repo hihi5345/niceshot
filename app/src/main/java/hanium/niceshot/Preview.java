@@ -22,6 +22,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
@@ -267,9 +268,9 @@ public class Preview extends Thread {
     }
 
     @SuppressLint("NewApi")
-    protected File takePicture(final Context context, int h, int w) {
-        //MediaActionSound mediaActionSound = new MediaActionSound();
-        //mediaActionSound.play(MediaActionSound.SHUTTER_CLICK);
+    protected File takePicture(final Context context, int h, int w, boolean flash) {
+        MediaActionSound mediaActionSound = new MediaActionSound();
+        mediaActionSound.play(MediaActionSound.SHUTTER_CLICK);
 
         String dirPath = "/sdcard/niceshot";
         File f = new File(dirPath);
@@ -309,7 +310,11 @@ public class Preview extends Thread {
             final CaptureRequest.Builder captureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(reader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-
+            captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CameraMetadata.CONTROL_AE_ANTIBANDING_MODE_AUTO);
+            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CameraMetadata.CONTROL_AF_MODE_AUTO);
+            captureBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CameraMetadata.CONTROL_AWB_MODE_AUTO);
+            if(flash)   captureBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
+            else    captureBuilder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
             // Orientation
             int rotation = ((Activity)mContext).getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
