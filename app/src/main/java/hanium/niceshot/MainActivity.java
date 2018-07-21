@@ -96,13 +96,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if(view.getId() == R.id.timerBtn){
             if(time == 0){
                 time = 3;
-                timerBtn.setImageResource(R.drawable.timer3);
+                timerBtn.setImageResource(R.drawable.timer3new);
             } else if(time == 3){
                 time = 5;
-                timerBtn.setImageResource(R.drawable.timer5);
+                timerBtn.setImageResource(R.drawable.timer5new);
             } else if(time == 5){
                 time = 10;
-                timerBtn.setImageResource(R.drawable.timer10);
+                timerBtn.setImageResource(R.drawable.timer10new);
             } else if(time == 10){
                 time = 0;
                 timerBtn.setImageResource(R.drawable.timer0);
