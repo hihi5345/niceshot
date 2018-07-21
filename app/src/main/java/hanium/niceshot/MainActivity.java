@@ -119,12 +119,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if(view.getId() == R.id.biasBtn){
             if(bias == 1){
                 bias = 3;
-                biasBtn.setImageResource(R.drawable.bias3_4);
+                biasBtn.setImageResource(R.drawable.bias3_4new);
                 width = 1280;
                 changeBias("3:4");
             } else if (bias == 3){
                 bias = 9;
-                biasBtn.setImageResource(R.drawable.bias9_16);
+                biasBtn.setImageResource(R.drawable.bias9_16new);
                 width = 1960;
                 changeBias("9:16");
 
